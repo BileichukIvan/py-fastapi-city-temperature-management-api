@@ -11,9 +11,11 @@ router = APIRouter()
 
 @router.get("/cities/", response_model=list[schemas.CityListSchema])
 def get_cities_list(
+        skip: int = 0,
+        limit: int = 10,
         db: Session = Depends(get_db)
 ) -> list[schemas.CityListSchema]:
-    return crud.get_cities_list(db=db)
+    return crud.get_cities_list(db=db, skip=skip, limit=limit)
 
 
 @router.post("/cities/", response_model=schemas.CitySchema)

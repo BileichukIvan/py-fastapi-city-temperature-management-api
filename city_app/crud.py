@@ -1,3 +1,4 @@
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
 from city_app import models, schemas
@@ -19,8 +20,10 @@ def get_city(db: Session, city_id: int) -> models.City:
     return city
 
 
-def get_cities_list(db: Session) -> list[models.City]:
-    return db.query(models.City).all()
+def get_cities_list(
+        db: Session | AsyncSession, skip: int = 0, limit: int = 10
+) -> list[models.City]:
+    return db.query(models.City).offset(skip).limit(limit).all()
 
 
 def delete_city(db: Session, city_id: int) -> None:
