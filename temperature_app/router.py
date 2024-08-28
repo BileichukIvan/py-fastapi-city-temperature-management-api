@@ -3,7 +3,7 @@ from city_app import crud as city_crud
 from dependencies import get_db
 from temperature_app import crud, schemas
 import httpx
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 from dotenv import load_dotenv
@@ -45,7 +45,10 @@ def get_temperatures(
 
 
 @router.get("/temperatures/{city_id}")
-def update_temperatures(
+def get_city_temperatures(
         city_id: int, db: Session = Depends(get_db)
-) -> schemas.TemperatureCitySchema:
-    return crud.get_temperatures_by_city_id(db=db, city_id=city_id)
+):
+    temperatures = crud.get_temperatures_by_city_id(db, city_id)
+    if not temperatures:
+        raise HTTPException(status_code=404, detail="Temperatures not found")
+    return temperatures
