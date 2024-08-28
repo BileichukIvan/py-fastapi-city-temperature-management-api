@@ -26,6 +26,6 @@ def get_cities_list(
     return db.query(models.City).offset(skip).limit(limit).all()
 
 
-def delete_city(db: Session, city_id: int) -> None:
+def delete_city_from_db(db: Session, city_id: int):
     db.query(models.City).filter(models.City.id == city_id).delete()
     db.commit()

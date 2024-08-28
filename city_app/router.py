@@ -1,6 +1,5 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from starlette import status
 from starlette.responses import RedirectResponse
 
 from city_app import crud, schemas
@@ -32,8 +31,11 @@ def get_city(
     return crud.get_city(city_id=city_id, db=db)
 
 
-@router.delete("/cities/{city_id}", response_model=status.HTTP_204_NO_CONTENT)
+@router.delete("/cities/{city_id}", response_model=schemas.CitySchema)
 def delete_city(
         city_id: int, db: Session = Depends(get_db)
 ) -> RedirectResponse:
-    return crud.delete_city(db=db, city_id=city_id)
+    db_city = crud.delete_city_from_db(db=db, city_id=city_id)
+    if db_city is None:
+        raise HTTPException(status_code=404, detail="City not found")
+    return db_city
