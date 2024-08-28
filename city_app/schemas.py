@@ -17,3 +17,7 @@ class CityListSchema(CitySchema):
 
 class CityCreateSchema(CitySchema):
     pass
+
+
+class CityUpdateSchema(CitySchema):
+    pass

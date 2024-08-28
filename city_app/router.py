@@ -31,7 +31,19 @@ def get_city(
     return crud.get_city(city_id=city_id, db=db)
 
 
-@router.delete("/cities/{city_id}", response_model=schemas.CitySchema)
+@router.put("/cities/{city_id}", response_model=schemas.CitySchema)
+def update_city(
+        city_id: int,
+        city: schemas.CityUpdateSchema,
+        db: Session = Depends(get_db)
+):
+    db_city = crud.get_city(db, city_id=city_id)
+    if db_city is None:
+        raise HTTPException(status_code=404, detail="City not found")
+    return crud.update_city(db=db, city=city, city_id=city_id)
+
+
+@router.delete("/cities/{city_id}", response_model=schemas.CityUpdateSchema)
 def delete_city(
         city_id: int, db: Session = Depends(get_db)
 ) -> RedirectResponse:

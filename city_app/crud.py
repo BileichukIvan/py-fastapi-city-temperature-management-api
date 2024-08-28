@@ -15,6 +15,20 @@ def create_city(db: Session, city: schemas.CityCreateSchema) -> models.City:
     return db_city
 
 
+def update_city(
+    db: Session, city_id: int, city: schemas.CityUpdateSchema
+):
+    db_city = get_city(db, city_id)
+    if db_city is None:
+        return None
+
+    db_city.name = city.name
+    db_city.additional_info = city.additional_info
+    db.commit()
+    db.refresh(db_city)
+    return db_city
+
+
 def get_city(db: Session, city_id: int) -> models.City:
     city = db.query(models.City).filter(models.City.id == city_id).first()
     return city
