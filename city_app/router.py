@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.responses import RedirectResponse
 
 from city_app import crud, schemas
@@ -9,45 +9,45 @@ router = APIRouter()
 
 
 @router.get("/cities/", response_model=list[schemas.CityListSchema])
-def get_cities_list(
+async def get_cities_list(
         skip: int = 0,
         limit: int = 10,
-        db: Session = Depends(get_db)
+        db: AsyncSession = Depends(get_db)
 ) -> list[schemas.CityListSchema]:
-    return crud.get_cities_list(db=db, skip=skip, limit=limit)
+    return await crud.get_cities_list(db=db, skip=skip, limit=limit)
 
 
 @router.post("/cities/", response_model=schemas.CitySchema)
-def create_city(
-        city: schemas.CityCreateSchema, db: Session = Depends(get_db)
+async def create_city(
+        city: schemas.CityCreateSchema, db: AsyncSession = Depends(get_db)
 ) -> schemas.CitySchema:
-    return crud.create_city(db=db, city=city)
+    return await crud.create_city(db=db, city=city)
 
 
 @router.get("/cities/{city_id}", response_model=schemas.CitySchema)
-def get_city(
-        city_id: int, db: Session = Depends(get_db)
+async def get_city(
+        city_id: int, db: AsyncSession = Depends(get_db)
 ) -> schemas.CitySchema:
-    return crud.get_city(city_id=city_id, db=db)
+    return await crud.get_city(city_id=city_id, db=db)
 
 
 @router.put("/cities/{city_id}", response_model=schemas.CitySchema)
-def update_city(
+async def update_city(
         city_id: int,
         city: schemas.CityUpdateSchema,
-        db: Session = Depends(get_db)
+        db: AsyncSession = Depends(get_db)
 ):
-    db_city = crud.get_city(db, city_id=city_id)
+    db_city = await crud.get_city(db, city_id=city_id)
     if db_city is None:
         raise HTTPException(status_code=404, detail="City not found")
-    return crud.update_city(db=db, city=city, city_id=city_id)
+    return await crud.update_city(db=db, city=city, city_id=city_id)
 
 
 @router.delete("/cities/{city_id}", response_model=schemas.CityUpdateSchema)
-def delete_city(
-        city_id: int, db: Session = Depends(get_db)
+async def delete_city(
+        city_id: int, db: AsyncSession = Depends(get_db)
 ) -> RedirectResponse:
-    db_city = crud.delete_city_from_db(db=db, city_id=city_id)
+    db_city = await crud.delete_city_from_db(db=db, city_id=city_id)
     if db_city is None:
         raise HTTPException(status_code=404, detail="City not found")
-    return db_city
+    return await db_city
