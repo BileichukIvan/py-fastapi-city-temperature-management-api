@@ -1,8 +1,12 @@
+from typing import Sequence
+
+from fastapi import Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from temperature_app import models
 from temperature_app.schemas import TemperatureCreateSchema
+from dependencies import pagination_params
 
 
 async def create_temperature(
@@ -17,10 +21,12 @@ async def create_temperature(
 
 
 async def get_temperatures(
-        db: AsyncSession, skip: int = 0, limit: int = 10
-) -> list[models.Temperature]:
+        db: AsyncSession,
+        pagination: dict = Depends(pagination_params),
+) -> Sequence[models.Temperature]:
     result = await db.execute(
-        select(models.Temperature).offset(skip).limit(limit)
+        select(models.Temperature).offset(
+            pagination["skip"]).limit(pagination["limit"])
     )
     temperatures = result.scalars().all()
     return temperatures

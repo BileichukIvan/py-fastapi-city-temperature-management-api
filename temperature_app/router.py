@@ -1,11 +1,12 @@
 import os
+from typing import Sequence
+
 from city_app import crud as city_crud
-from dependencies import get_db
-from temperature_app import crud, schemas
+from dependencies import get_db, pagination_params
+from temperature_app import crud, schemas, models
 import httpx
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Session
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -37,11 +38,12 @@ async def get_temperatures_list(db: AsyncSession = Depends(get_db)):
     "/temperatures", response_model=list[schemas.TemperatureCitySchema]
 )
 async def get_temperatures(
-        skip: int = 0,
-        limit: int = 10,
+        pagination: dict = Depends(pagination_params),
         db: AsyncSession = Depends(get_db)
-) -> list[schemas.TemperatureCitySchema]:
-    return await crud.get_temperatures(db=db, skip=skip, limit=limit)
+) -> Sequence[models.Temperature]:
+    return await crud.get_temperatures(
+        db=db, skip=pagination["skip"], limit=pagination["limit"]
+    )
 
 
 @router.get("/temperatures/{city_id}")

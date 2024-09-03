@@ -1,33 +1,34 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from starlette.responses import RedirectResponse
+from starlette.responses import Response
 
-from city_app import crud, schemas
-from dependencies import get_db
+from city_app import crud, schemas, models
+from dependencies import get_db, pagination_params
 
 router = APIRouter()
 
 
 @router.get("/cities/", response_model=list[schemas.CityListSchema])
 async def get_cities_list(
-        skip: int = 0,
-        limit: int = 10,
+        pagination: dict = Depends(pagination_params),
         db: AsyncSession = Depends(get_db)
-) -> list[schemas.CityListSchema]:
-    return await crud.get_cities_list(db=db, skip=skip, limit=limit)
+) -> list[models.City]:
+    return await crud.get_cities_list(
+        db=db, skip=pagination["skip"], limit=pagination["limit"]
+    )
 
 
 @router.post("/cities/", response_model=schemas.CitySchema)
 async def create_city(
         city: schemas.CityCreateSchema, db: AsyncSession = Depends(get_db)
-) -> schemas.CitySchema:
+) -> models.City:
     return await crud.create_city(db=db, city=city)
 
 
 @router.get("/cities/{city_id}", response_model=schemas.CitySchema)
 async def get_city(
         city_id: int, db: AsyncSession = Depends(get_db)
-) -> schemas.CitySchema:
+) -> models.City:
     return await crud.get_city(city_id=city_id, db=db)
 
 
@@ -46,8 +47,6 @@ async def update_city(
 @router.delete("/cities/{city_id}", response_model=schemas.CityUpdateSchema)
 async def delete_city(
         city_id: int, db: AsyncSession = Depends(get_db)
-) -> RedirectResponse:
-    db_city = await crud.delete_city_from_db(db=db, city_id=city_id)
-    if db_city is None:
-        raise HTTPException(status_code=404, detail="City not found")
-    return await db_city
+) -> Response:
+    await crud.delete_city_from_db(db=db, city_id=city_id)
+    return Response(status_code=204)

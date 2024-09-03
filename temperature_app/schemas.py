@@ -7,8 +7,8 @@ from city_app.schemas import CitySchema
 
 class TemperatureBaseSchema(BaseModel):
     city_id: int
-    date_time: datetime
-    temperature: float
+    date_time: datetime | None
+    temperature: float | None
 
 
 class TemperatureCitySchema(TemperatureBaseSchema):
@@ -16,7 +16,7 @@ class TemperatureCitySchema(TemperatureBaseSchema):
     city: CitySchema
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 
 class TemperatureCreateSchema(TemperatureBaseSchema):

@@ -5,14 +5,14 @@ from pydantic import BaseModel
 
 class CitySchema(BaseModel):
     name: str
-    additional_info: Optional[str]
+    additional_info: str | None
 
 
 class CityListSchema(CitySchema):
     id: int
 
     class Config:
-        from_attribute = True
+        orm_mode = True
 
 
 class CityCreateSchema(CitySchema):

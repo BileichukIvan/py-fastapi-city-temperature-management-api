@@ -36,7 +36,7 @@ async def get_city(db: AsyncSession, city_id: int) -> models.City:
 
 
 async def get_cities_list(
-        db: AsyncSession, skip: int = 0, limit: int = 10
+        db: AsyncSession
 ) -> list[models.City]:
     result = await db.scalars(select(models.City))
     return result.all()
