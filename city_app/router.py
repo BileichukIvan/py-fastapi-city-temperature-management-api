@@ -1,3 +1,5 @@
+from typing import Sequence
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.responses import Response
@@ -12,7 +14,7 @@ router = APIRouter()
 async def get_cities_list(
         pagination: dict = Depends(pagination_params),
         db: AsyncSession = Depends(get_db)
-) -> list[models.City]:
+) -> Sequence[models.City]:
     return await crud.get_cities_list(
         db=db, skip=pagination["skip"], limit=pagination["limit"]
     )
@@ -44,7 +46,7 @@ async def update_city(
     return await crud.update_city(db=db, city=city, city_id=city_id)
 
 
-@router.delete("/cities/{city_id}", response_model=schemas.CityUpdateSchema)
+@router.delete("/cities/{city_id}", response_model=schemas.CitySchema)
 async def delete_city(
         city_id: int, db: AsyncSession = Depends(get_db)
 ) -> Response:

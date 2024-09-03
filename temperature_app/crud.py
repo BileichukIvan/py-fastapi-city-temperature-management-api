@@ -21,12 +21,10 @@ async def create_temperature(
 
 
 async def get_temperatures(
-        db: AsyncSession,
-        pagination: dict = Depends(pagination_params),
+        db: AsyncSession, skip: int = 0, limit: int = 10
 ) -> Sequence[models.Temperature]:
     result = await db.execute(
-        select(models.Temperature).offset(
-            pagination["skip"]).limit(pagination["limit"])
+        select(models.Temperature).offset(skip).limit(limit)
     )
     temperatures = result.scalars().all()
     return temperatures

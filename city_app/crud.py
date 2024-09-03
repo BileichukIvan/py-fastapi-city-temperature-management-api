@@ -1,3 +1,5 @@
+from typing import Sequence
+
 from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -36,13 +38,16 @@ async def get_city(db: AsyncSession, city_id: int) -> models.City:
 
 
 async def get_cities_list(
-        db: AsyncSession
-) -> list[models.City]:
-    result = await db.scalars(select(models.City))
-    return result.all()
+        db: AsyncSession, skip: int = 0, limit: int = 10
+) -> Sequence[models.City]:
+    result = await db.execute(
+        select(models.City).offset(skip).limit(limit)
+    )
+    cities = result.scalars().all()
+    return cities
 
 
-async def delete_city_from_db(db: AsyncSession, city_id: int):
+async def delete_city_from_db(db: AsyncSession, city_id: int) -> None:
     action = delete(models.City).where(models.City.id == city_id)
     await db.execute(action)
     await db.commit()

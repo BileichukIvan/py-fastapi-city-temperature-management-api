@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from city_app.schemas import CitySchema
 
@@ -15,8 +15,7 @@ class TemperatureCitySchema(TemperatureBaseSchema):
     id: int
     city: CitySchema
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_orm=True)
 
 
 class TemperatureCreateSchema(TemperatureBaseSchema):

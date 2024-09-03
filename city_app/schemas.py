@@ -1,6 +1,4 @@
-from typing import Optional
-
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class CitySchema(BaseModel):
@@ -11,8 +9,7 @@ class CitySchema(BaseModel):
 class CityListSchema(CitySchema):
     id: int
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_orm=True)
 
 
 class CityCreateSchema(CitySchema):
